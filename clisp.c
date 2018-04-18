@@ -13,7 +13,7 @@ typedef struct List {
 //global head of the symbols list
 List *symbols = 0;
 
-// look ahead caharacter
+// look ahead character
 static int look;
 //array of symbols
 #define SYMBOL_MAX 32
