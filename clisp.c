@@ -13,15 +13,15 @@ typedef struct List {
 //global head of the symbols list
 List *symbols = 0;
 
-// look ahead character
+// \look ahead character
 static int look;
 //array of symbols
 #define SYMBOL_MAX 32
 static char token[SYMBOL_MAX];
 
 //check if char is whitespace
-int is_space(char cur) {
-  return cur == ' ' || cur == '\n';
+int is_space(char cur){
+  return cur == ' ' || cur == '\n' || cur == '\0';
 }
 
 //check if char is parens
@@ -119,7 +119,6 @@ void print_obj(List *ob, int list_head) {
       printf(" ");
       print_obj(cdr(ob), 0);
     } else printf(")");
-
   }
 }
 
@@ -154,6 +153,7 @@ List *fnull(List *a) {
 
 List *freadobj(List *a) {
   look = getchar();
+
   get_token();
   return get_obj();
 }
@@ -164,14 +164,14 @@ List *fwriteobj(List *a) {
   return e_true;
 }
 
-//foward declartion
+//forward declaration
 List *eval(List *exp, List *env);
 
 
 //evaluates a list
-//maintains order while evaluationg each item
+//maintains order while evaluating each item
 List *eval_list(List *list, List *env) {
-  //parallel list with evaled eles in same order
+  //parallel list with eval'd eles in same order
   List *head = 0, **args = &head;
 
   for(; list; list = cdr(list)) {
@@ -251,19 +251,22 @@ List *eval(List *exp, List *env) {
 
 int main(int argc, char *argv[]) {
   List *env = cons(cons(intern("car"), cons((void *)fcar, 0)),
-              cons(cons(intern("cdr"), cons((void *)fcdr, 0)),
-              cons(cons(intern("cons"), cons((void *)fcons, 0)),
-              cons(cons(intern("eq?"), cons((void *)feq, 0)),
-              cons(cons(intern("pair?"), cons((void *)fpair, 0)),
-              cons(cons(intern("symbol?"), cons((void *)fatom, 0)),
-              cons(cons(intern("null?"), cons((void *)fnull, 0)),
-              cons(cons(intern("read"), cons((void *)freadobj, 0)),
-              cons(cons(intern("write"), cons((void *)fwriteobj, 0)),
-              cons(cons(intern("null"), cons(0,0)), 0))))))))));
+		   cons(cons(intern("cdr"), cons((void *)fcdr, 0)),
+			cons(cons(intern("cons"), cons((void *)fcons, 0)),
+			     cons(cons(intern("eq?"), cons((void *)feq, 0)),
+				  cons(cons(intern("pair?"), cons((void *)fpair, 0)),
+				       cons(cons(intern("symbol?"), cons((void *)fatom, 0)),
+					    cons(cons(intern("null?"), cons((void *)fnull, 0)),
+						 cons(cons(intern("read"), cons((void *)freadobj, 0)),
+						      cons(cons(intern("write"), cons((void *)fwriteobj, 0)),
+							   cons(cons(intern("null"), cons(0,0)), 0))))))))));
 
-  look = getchar();
-  get_token();
-  print_obj(eval(get_obj(), env), 1 );
-  printf("\n");
+
+  while(look != EOF) {
+    look = getchar();
+    get_token();
+    print_obj(eval(get_obj(), env), 1 );
+    printf("\n");
+  }
   return 0;
 }
