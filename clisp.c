@@ -251,6 +251,7 @@ List *eval(List *exp, List *env) {
 
 int main(int argc, char *argv[]) {
   List *env = cons(cons(intern("car"), cons((void *)fcar, 0)),
+<<<<<<< HEAD
 	      cons(cons(intern("cdr"), cons((void *)fcdr, 0)),
 	      cons(cons(intern("cons"), cons((void *)fcons, 0)),
 	      cons(cons(intern("eq?"), cons((void *)feq, 0)),
@@ -260,6 +261,17 @@ int main(int argc, char *argv[]) {
 	      cons(cons(intern("read"), cons((void *)freadobj, 0)),
 	      cons(cons(intern("write"), cons((void *)fwriteobj, 0)),
 	      cons(cons(intern("null"), cons(0,0)), 0))))))))));
+=======
+		   cons(cons(intern("cdr"), cons((void *)fcdr, 0)),
+			cons(cons(intern("cons"), cons((void *)fcons, 0)),
+			     cons(cons(intern("eq?"), cons((void *)feq, 0)),
+				  cons(cons(intern("pair?"), cons((void *)fpair, 0)),
+				       cons(cons(intern("symbol?"), cons((void *)fatom, 0)),
+					    cons(cons(intern("null?"), cons((void *)fnull, 0)),
+						 cons(cons(intern("read"), cons((void *)freadobj, 0)),
+						      cons(cons(intern("write"), cons((void *)fwriteobj, 0)),
+							   cons(cons(intern("null"), cons(0,0)), 0))))))))));
+>>>>>>> e5012b435992fffa16c08557f998a33bcb8d779a
 
 
   while(look != EOF) {
