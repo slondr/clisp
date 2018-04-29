@@ -1,7 +1,7 @@
 .PHONY: clean
 
 CC ?= gcc
-CFLAGS += -Wall -pedantic -O2 -g
+CFLAGS += -Werror -Wall -pedantic -O2 -g
 
 all: clean clisp
 

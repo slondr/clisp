@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+
 #define debug(m,e) printf("%s:%d: %s",__FILE__,__LINE__,m); print_obj(e,1); puts("");
 
 typedef struct List {
@@ -40,12 +42,11 @@ static void get_token() {
   if(is_parens(look)) {
     token[index++] = look;
     look = getchar();
-  } else {
-    while(index < SYMBOL_MAX - 1 && look != EOF && !is_space(look) && !is_parens(look)) {
+  } else while(index < SYMBOL_MAX - 1 && look != EOF && !is_space(look) && !is_parens(look)) {
       token[index++] = look;
       look = getchar();
     }
-  }
+  
 
   token[index] = '\0';
 }
@@ -78,9 +79,9 @@ List * cons(void *_car, void *_cdr) {
 void *intern(char *sym) {
   List *_pair = symbols;
   
-  for(; _pair; _pair = cdr(_pair)) {
-    if(strncmp(sym, (char*) car(_pair), 32) == 0) return car(_pair);
-  }
+  for(; _pair; _pair = cdr(_pair))
+    if(strncmp(sym, (char*) car(_pair), 32) == 0)
+      return car(_pair);
 
   symbols = cons(strdup(sym), symbols);
   return car(symbols);
@@ -173,13 +174,13 @@ List *eval(List *exp, List *env);
 List *eval_list(List *list, List *env) {
   //parallel list with eval'd eles in same order
   List *head = 0, **args = &head;
-
-  for(; list; list = cdr(list)) {
+  
+  do { 
     *args = cons(eval(car(list), env), 0);
     //c is annoying sometimes
     args = &((List*) untag(*args))->next;
-  }
-
+  } while((list = cdr(list)));
+  
   return head;
 }
 
@@ -191,20 +192,22 @@ List *apply_primitive(void *l_fn, List *args) {
 
 List *eval(List *exp, List *env) {
   if(is_atom(exp)) {
-
-    for(; env != 0; env = cdr(env)) {
-      if(exp == car(car(env))) return car(cdr(car(env)));
+    
+    while(env != 0) {
+      if(exp == car(car(env)))
+	return car(cdr(car(env)));
+      env = cdr(env);
     }
-
+    
     return 0;
 
   } else if(is_atom(car(exp))) {
     //other cases
-
+    
     if(car(exp) == intern("quote")) {
       return car(cdr(exp));
     } else if(car(exp) == intern("if")) {
-
+      
       if(eval(car(cdr(exp)), env) != 0) {
         return eval(car(cdr(cdr(exp))), env);
       } else {
@@ -250,8 +253,7 @@ List *eval(List *exp, List *env) {
 }
 
 int main(int argc, char *argv[]) {
-  List *env = cons(cons(intern("car"), cons((void *)fcar, 0)),
-<<<<<<< HEAD
+  List *env = cons(cons(intern("car"), cons((void *)fcar, 0)), 
 	      cons(cons(intern("cdr"), cons((void *)fcdr, 0)),
 	      cons(cons(intern("cons"), cons((void *)fcons, 0)),
 	      cons(cons(intern("eq?"), cons((void *)feq, 0)),
@@ -259,26 +261,15 @@ int main(int argc, char *argv[]) {
 	      cons(cons(intern("symbol?"), cons((void *)fatom, 0)),
 	      cons(cons(intern("null?"), cons((void *)fnull, 0)),
 	      cons(cons(intern("read"), cons((void *)freadobj, 0)),
-	      cons(cons(intern("write"), cons((void *)fwriteobj, 0)),
-	      cons(cons(intern("null"), cons(0,0)), 0))))))))));
-=======
-		   cons(cons(intern("cdr"), cons((void *)fcdr, 0)),
-			cons(cons(intern("cons"), cons((void *)fcons, 0)),
-			     cons(cons(intern("eq?"), cons((void *)feq, 0)),
-				  cons(cons(intern("pair?"), cons((void *)fpair, 0)),
-				       cons(cons(intern("symbol?"), cons((void *)fatom, 0)),
-					    cons(cons(intern("null?"), cons((void *)fnull, 0)),
-						 cons(cons(intern("read"), cons((void *)freadobj, 0)),
-						      cons(cons(intern("write"), cons((void *)fwriteobj, 0)),
-							   cons(cons(intern("null"), cons(0,0)), 0))))))))));
->>>>>>> e5012b435992fffa16c08557f998a33bcb8d779a
+              cons(cons(intern("write"), cons((void *)fwriteobj, 0)),
+    	      cons(cons(intern("null"), cons(0,0)), 0))))))))));
 
-
-  while(look != EOF) {
-    look = getchar();
-    get_token();
-    print_obj(eval(get_obj(), env), 1 );
-    printf("\n");
-  }
-  return 0;
+    do {
+      printf("\n=> ");
+      look = getchar();
+      get_token();
+      print_obj(eval(get_obj(), env), 1);
+    } while (look != EOF);
+    
+    return 0;
 }
